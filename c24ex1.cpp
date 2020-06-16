@@ -1,38 +1,27 @@
 #include<bits/stdc++.h>
 using namespace std;
-vector<int> p;
+int p[200020];
 int c;
-int l[200000]; //l[i] é o maior lucro possível entre os dias [i..n-1]
-
-int maxLucro(int i, int n){
-    //retorna o maior lucro possível usando a ação i em [i...n]
-    if (p[n] - p[i] - c < 0) return 0;
-    else return (p[n] - p[i] - c + l[n+1]);
-}
+int l[200020][2]; //l[i][0] é o maior lucro possível entre os dias [i..n-1] tendo uma ação e l[i][1] é o lucro máximo não tendo uma ação
 
 int solve(int n){
     //devolve o lucro máximo entre os dias [0...n-1] (top-down)
-    l[n] = 0;
-    l[n-1] = 0;
+    l[n-1][0] = 0;
+    l[n-1][1] = p[n-1];
     for (int j = n-2; j >= 0; j--){
-        l[j] = 0;
-        for (int k = n-1; k > j; k--) l[j] = max(l[j+1], max(l[j], maxLucro(j, k)));
+        l[j][0] = max(0, max(l[j+1][0], l[j+1][1] - c - p[j]));
+        l[j][1] = max(0, max(l[j+1][1], l[j+1][0] + p[j]));
     }
-    return l[0];
+    return l[0][0];
 }
 
 int main(){
     int n, v;
-
-    memset(l, -1, sizeof(l));
-    while (cin >> n){
-        cin >> c;
-        for (int i = 0; i < n; i++) {
-            cin >> v;
-            p.push_back(v);
-        }
-        cout << solve(n) << endl;
-        p.clear();
+    
+    while (scanf("%d %d", &n, &c) != EOF){
+        int i;
+        for (i = 0; i < n; i++) scanf("%d", &(p[i]));
+        printf("%lld\n", solve(n));
     }
     return 0;
 }
